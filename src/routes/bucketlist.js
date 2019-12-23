@@ -105,13 +105,25 @@ router.get('/:id/items/:item_id', passport.authenticate('jwt', { session: false 
 //update a bucket list item
 router.put('/:id/items/:item_id', passport.authenticate('jwt', { session: false }), (req, res) => {
   BucketList.findById(req.params.id)
-    .then(bucketlist => bucketlist.items)
-    .then(items => items.filter(item => item.id === +req.params.item_id))
-    .then(updatedItem => {
-      updatedItem.name = res.body.name,
-        updatedItem.done = res.body.done,
-        updatedItem.id = res.body.id
+    .then(bucketlist => {
+      const items = bucketlist.items
+      const item = items.filter(item => item.id === +req.params.item_id)
+      delete item
+      const updatedItem = {
+        name: res.body.name,
+        done: res.body.done,
+        id: res.body.id
+      }
+      bucketlist.unshift(updatedItem)
+      bucketlist.save()
     })
+    // .then(updatedItem => {
+    //   const it = updatedItem[0]
+    //   it.name = res.body.name,
+    //     it.done = res.body.done,
+    //     it.id = res.body.id
+    // })
+    // bucketlist.save()
 })
 
 
